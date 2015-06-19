@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	<comment>JAVA代码内部国际化配置</comment>
+	<entry key="i18n">hello i18n</entry>
+</properties>

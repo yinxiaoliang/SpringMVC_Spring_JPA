@@ -2,234 +2,46 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
-     	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd"
+     	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd"
 	default-lazy-init="false">
 
-	<!-- 定时任务 -->
-	<!-- class="org.springframework.scheduling.quartz.CronTriggerBean"> -->
-
-	<bean id="qprocessJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.QProcessJob" />
-		<property name="jobDataAsMap">
-			<map>
-				<entry key="officeNos" value="海航清Q组*HKK540#天航清Q组*TSN303#西部清Q组*CKG111#祥鹏清Q组*LKE950"></entry>
-			</map>
-		</property>
-		<property name="durability" value="true" />
-	</bean>
-	<!-- 定时清Q -->
-	<bean id="qprocessTrigger" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="qprocessJobDetail" />
-		<property name="cronExpression" value="0 0/30 * * * ?" />
-	</bean>
-	<!-- 定时同步订单,同步黑屏出票订单 -->
-	<bean id="orderSyncJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.OrderSyncJob" />
-		<property name="durability" value="true" />
-	</bean>
-	
-	<bean id="orderSyncTrigger" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="orderSyncJobDetail" />
-		<property name="cronExpression" value="0 0/30 * * * ?" />
-	</bean>
-	<!-- 定时清票,取消超过留票时限的PNR -->
-	<bean id="pnrClearJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PNRClearJob" />
-		<property name="durability" value="true" />
-		 <property name="jobDataAsMap"> 
-			<map>
-				<entry key="orderTime" value="7"/>
-				<entry key="messageTime" value="2"/>
-			</map>
-		</property>  
-	</bean>
-	
-	<bean id="pnrClearTrigger" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="pnrClearJobDetail" />
-		<property name="cronExpression" value="0 0/30 * * * ?" />
-	</bean>
-	<!-- 定时清除临时PNR -->
-	<bean id="pnrLogProcessJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PNRLogProcessJob" />
-		<property name="durability" value="true" />
-	</bean>
-	
-	<bean id="pnrLogProcessTrigger" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="pnrLogProcessJobDetail" />
-		<property name="cronExpression" value="0 0/15 * * * ?" />
-	</bean>
-	
-	<!-- 定时缓存价格 -->
-	<bean id="priceCahceJobDetail_8L_01" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_8L_01" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_8L_02" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_8L_02" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_8L_03" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_8L_03" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_GS_01" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_GS_01" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_GS_02" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_GS_02" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_GS_03" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_GS_03" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_HU_01" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_HU_01" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_HU_02" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_HU_02" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_HU_03" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_HU_03" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_HU_04" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_HU_04" />
-		<property name="durability" value="true" />
-	</bean>
-		<bean id="priceCahceJobDetail_HU_05" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_HU_05" />
-		<property name="durability" value="true" />
-	</bean>
-	<bean id="priceCahceJobDetail_PN_01" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="com.hnair.callcenter.application.jobs.PriceCahceProcessJob_PN_01" />
-		<property name="durability" value="true" />
-	</bean>
-	<!-- 定时缓存价格 -->
-	<bean id="priceCahceTrigger_8L_01" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_8L_01" />
-		<property name="cronExpression" value="0 30 1 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_8L_02" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_8L_02" />
-		<property name="cronExpression" value="0 30 2 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_8L_03" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_8L_03" />
-		<property name="cronExpression" value="0 30 3 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_GS_01" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_GS_01" />
-		<property name="cronExpression" value="0 30 1 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_GS_02" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_GS_02" />
-		<property name="cronExpression" value="0 30 2 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_GS_03" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_GS_03" />
-		<property name="cronExpression" value="0 30 3 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_HU_01" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_HU_01" />
-		<property name="cronExpression" value="0 30 1 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_HU_02" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_HU_02" />
-		<property name="cronExpression" value="0 30 2 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_HU_03" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_HU_03" />
-		<property name="cronExpression" value="0 30 3 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_HU_04" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_HU_04" />
-		<property name="cronExpression" value="0 30 4 * * ?" />
-	</bean>
-	<bean id="priceCahceTrigger_HU_05" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_HU_05" />
-		<property name="cronExpression" value="0 30 5 * * ?" />
-	</bean>
-	
-	<bean id="priceCahceTrigger_PN_01" class="com.hnair.callcenter.infrastructure.quartz.PersistableCronTriggerFactoryBean">
-		<property name="jobDetail" ref="priceCahceJobDetail_PN_01" />
-		<property name="cronExpression" value="0 30 1 * * ?" />
-	</bean>
-
-	<bean id="quartzScheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-
+	<!-- 定时任务演示 -->
+	<bean id="quartzScheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
 		<property name="configLocation" value="classpath:quartz.properties" />
 		<property name="dataSource" ref="dataSource" />
-<!-- 		<property name="transactionManager" ref="transactionManager" /> -->
-
-		<!-- This name is persisted as SCHED_NAME in db. for local testing could 
-			change to unique name to avoid collision with dev server -->
-		<property name="schedulerName" value="hnccQuartzScheduler" />
-
-		<!-- Will update database cron triggers to what is in this jobs file on 
-			each deploy. Replaces all previous trigger and job data that was in the database. 
-			YMMV -->
+		<property name="transactionManager" ref="transactionManager" />
 		<property name="overwriteExistingJobs" value="true" />
-
 		<property name="autoStartup" value="true" />
 		<property name="applicationContextSchedulerContextKey" value="applicationContext" />
-		<property name="jobFactory">
-			<bean class="com.hnair.callcenter.infrastructure.quartz.AutowireSpringBeanJobFactory" />
-		</property>
-
-		<!-- NOTE: Must add both the jobDetail and trigger to the scheduler! -->
-		<property name="jobDetails">
-			<list>
-				<ref bean="qprocessJobDetail" />
- 				<ref bean="orderSyncJobDetail" />
- 				<ref bean="pnrClearJobDetail" /> 
-				<ref bean="pnrLogProcessJobDetail" /> <!-- -->
-				<ref bean="priceCahceJobDetail_8L_01" />
-				<ref bean="priceCahceJobDetail_8L_02" />
-				<ref bean="priceCahceJobDetail_8L_03" />
-				
-				<ref bean="priceCahceJobDetail_GS_01" />
-				<ref bean="priceCahceJobDetail_GS_02" />
-				<ref bean="priceCahceJobDetail_GS_03" />
-				
-				<ref bean="priceCahceJobDetail_HU_01" />
-				<ref bean="priceCahceJobDetail_HU_02" />
-				<ref bean="priceCahceJobDetail_HU_03" />
-				<ref bean="priceCahceJobDetail_HU_04" />
-				<ref bean="priceCahceJobDetail_HU_05" />
-				
-				<ref bean="priceCahceJobDetail_PN_01" />
-				
-			</list>
-		</property>
 		<property name="triggers">
 			<list>
-				<ref bean="qprocessTrigger" />
- 				<ref bean="orderSyncTrigger" />
- 				<ref bean="pnrClearTrigger" /> 
- 				<ref bean="pnrLogProcessTrigger" /><!-- -->
- 				
- 				<ref bean="priceCahceTrigger_8L_01" />
-				<ref bean="priceCahceTrigger_8L_02" />
-				<ref bean="priceCahceTrigger_8L_03" />
-				
-				<ref bean="priceCahceTrigger_GS_01" />
-				<ref bean="priceCahceTrigger_GS_02" />
-				<ref bean="priceCahceTrigger_GS_03" />
-				
-				<ref bean="priceCahceTrigger_HU_01" />
-				<ref bean="priceCahceTrigger_HU_02" />
-				<ref bean="priceCahceTrigger_HU_03" />
-				<ref bean="priceCahceTrigger_HU_04" />
-				<ref bean="priceCahceTrigger_HU_05" />
-				
-				<ref bean="priceCahceTrigger_PN_01" />
+				<ref bean="demoCronTrigger" />
 			</list>
 		</property>
 	</bean>
+	
+	<bean id="demoCronTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="demoJobDetail" />
+		<property name="cronExpression" value="0 0/3 * * * ?" />
+	</bean>
+
+	<bean id="demoJobDetail"
+		class="org.springframework.scheduling.quartz.JobDetailBean">
+		<property name="jobClass">
+			<value>com.integration.infrastructure.quartz.MyQuartzJobBean</value>
+		</property> 
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="targetObject" value="demo_job"></entry>
+				<entry key="targetMethod" value="execute"></entry>
+				<entry key="concurrent" value="false"></entry>
+				<entry key="emf" value-ref="entityManagerFactory"></entry>
+			</map>
+		</property>
+	</bean>
+
 </beans>
