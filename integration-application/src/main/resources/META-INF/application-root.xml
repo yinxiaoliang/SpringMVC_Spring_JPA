@@ -1,0 +1,111 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+     	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd"
+	default-lazy-init="false">
+	<!-- 开启注解功能 -->
+	<context:annotation-config />
+	<context:component-scan base-package="com.integration*">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+
+
+	<!-- 指定数据库属性文件 -->
+	<context:property-placeholder location="classpath:application.properties" />
+
+	<!-- 属性文件加密bean配置 -->
+ 	<!-- <bean
+		class="com.integration.infrastructure.thirdparty.EncryptPropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:application.properties</value>
+			</list>
+		</property>
+	</bean> -->
+
+	<!-- 数据源配置 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="${database.driver}"></property>
+		<property name="jdbcUrl" value="${database.url}"></property>
+		<property name="user" value="${database.username}"></property>
+		<property name="password" value="${database.password}"></property>
+
+		<!--详细参数说明参见application.properties -->
+		<property name="initialPoolSize" value="${database.initialPoolSize}"></property>
+		<property name="minPoolSize" value="${database.minPoolSize}"></property>
+		<property name="maxPoolSize" value="${database.maxPoolSize}"></property>
+		<property name="maxIdleTime" value="${database.maxIdleTime}"></property>
+		<property name="acquireIncrement" value="${database.acquireIncrement}"></property>
+		<property name="idleConnectionTestPeriod" value="${database.idleConnectionTestPeriod}"></property>
+		<property name="acquireRetryAttempts" value="${database.acquireRetryAttempts}"></property>
+		<property name="breakAfterAcquireFailure" value="${database.breakAfterAcquireFailure}"></property>
+		<property name="maxStatements" value="${database.maxStatements}"></property>
+		<property name="testConnectionOnCheckin" value="${database.testConnectionOnCheckin}"></property>
+	</bean>
+
+	<bean
+		class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
+
+	<!-- JPA工厂配置 -->
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan">
+			<list>
+				<value>com.integration*</value>
+			</list>
+		</property>
+		<property name="jpaVendorAdapter">
+			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+				<property name="database" value="${database.type}" />
+				<property name="showSql" value="${database.showsql}" />
+			</bean>
+		</property>
+		<!-- 根据实体Bean自动生成表 -->
+		<property name="jpaProperties">
+			<props>
+				<prop key="javax.persistence.sharedCache.mode">ENABLE_SELECTIVE</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				<prop key="hibernate.cache.use_second_level_cache">true</prop>
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory
+				</prop>
+				<prop key="net.sf.ehcache.configurationResourceName">/META-INF/ehcache.xml</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 定义事务 -->
+	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+	<!-- 启用事物 -->
+	<context:annotation-config />
+	<!-- 注释让事务有效 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<aop:aspectj-autoproxy />
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 配置Spring Data JPA扫描目录 -->
+	<!-- 自己订制自己的Repository，还可以在自己的Repository里面添加自己使用的公共方法, 当然更灵活的是自己写一个实现类，来实现自己需要的方法 
+		,做如下配置可以定义xxxRepositoryImpl,jpa可以扫描到 -->
+	<jpa:repositories base-package="com.integration.infrastructure.repository"
+		repository-impl-postfix="Impl" entity-manager-factory-ref="entityManagerFactory"
+		transaction-manager-ref="transactionManager" />
+</beans>

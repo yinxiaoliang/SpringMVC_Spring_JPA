@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<description>Shiro安全配置</description>
+
+	<!-- Shiro's main business-tier object for web-enabled applications -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="jpaShiroRealm" />
+	</bean>
+
+	<!-- 項目自定义的Realm -->
+	<bean id="jpaShiroRealm" class="com.hnair.callcenter.application.security.JpaShiroRealm" />
+	
+	<bean id="ctiAuthc" class="com.hnair.callcenter.interfaces.web.security.CtiFormAuthenticationFilter"></bean>
+	
+	<!-- Shiro Filter -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="/login" />
+		<property name="successUrl" value="${loginconfig.successurl}" />
+		<property name="unauthorizedUrl" value="/401.jsp"></property>
+		<property name="filters">
+			<map>
+				<entry key="ctiAuthc" value-ref="ctiAuthc"/><!-- 自定义authc Filter -->
+			</map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+					/login = ctiAuthc
+					/resources/** = anon
+					/pay/** = anon
+					/counter/** = anon
+					/ws/**=anon
+					/validcode = anon
+					<!-- /admin/** = ctiAuthc  访问admin下资源需要登陆 
+					/security** = roles["admin"]
+					/response/** = ctiAuthc
+					/response** = ctiAuthc
+					/report** = ctiAuthc 报表模块
+					/call/** = ctiAuthc
+					/sales** = ctiAuthc
+					/sales/** = ctiAuthc
+					/flight** = ctiAuthc
+					/sale-pnr/** = ctiAuthc
+					/security** = ctiAuthc
+					/sys** = ctiAuthc
+					/ticketchange** = ctiAuthc
+					/addition/** = ctiAuthc
+					/business** = ctiAuthc
+					/commonquery*/** = ctiAuthc
+					/free** = ctiAuthc
+					/product/** = ctiAuthc -->
+					/** = ctiAuthc
+			</value>
+		</property>
+	</bean>
+
+	<!-- 保证实现了Shiro内部lifecycle函数的bean执行 -->
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+</beans>
